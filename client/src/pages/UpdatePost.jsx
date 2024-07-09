@@ -18,7 +18,13 @@ export default function UpdatePost() {
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: '',
+    category: '',
+    content: '',
+    image: '',
+    _id: '',
+  });
   const [publishError, setPublishError] = useState(null);
   const { postId } = useParams();
 
@@ -37,7 +43,10 @@ export default function UpdatePost() {
         }
         setPublishError(null);
         console.log(data.posts[0]); // Debug log
-        setFormData(data.posts[0]);
+        setFormData({
+          ...formData,
+          ...data.posts[0],
+        });
       } catch (error) {
         console.log(error.message);
       }
@@ -46,7 +55,7 @@ export default function UpdatePost() {
     fetchPost();
   }, [postId]);
 
-  const handleUpdloadImage = async () => {
+  const handleUploadImage = async () => {
     try {
       if (!file) {
         setImageUploadError('Please select an image');
@@ -72,7 +81,10 @@ export default function UpdatePost() {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setImageUploadProgress(null);
             setImageUploadError(null);
-            setFormData({ ...formData, image: downloadURL });
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              image: downloadURL,
+            }));
           });
         }
       );
@@ -119,13 +131,19 @@ export default function UpdatePost() {
             id='title'
             className='flex-1'
             onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
+              setFormData((prevFormData) => ({
+                ...prevFormData,
+                title: e.target.value,
+              }))
             }
             value={formData.title}
           />
           <Select
             onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
+              setFormData((prevFormData) => ({
+                ...prevFormData,
+                category: e.target.value,
+              }))
             }
             value={formData.category}
           >
@@ -146,7 +164,7 @@ export default function UpdatePost() {
             gradientDuoTone='purpleToBlue'
             size='sm'
             outline
-            onClick={handleUpdloadImage}
+            onClick={handleUploadImage}
             disabled={imageUploadProgress}
           >
             {imageUploadProgress ? (
@@ -176,7 +194,10 @@ export default function UpdatePost() {
           className='h-72 mb-12'
           required
           onChange={(value) => {
-            setFormData({ ...formData, content: value });
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              content: value,
+            }));
           }}
         />
         <Button type='submit' gradientDuoTone='purpleToPink'>
